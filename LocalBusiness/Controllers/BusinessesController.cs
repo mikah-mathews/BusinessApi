@@ -14,8 +14,8 @@ using LocalBusiness.Services;
 
 namespace LocalBusiness.Controllers
 {
-  [ApiVersion("1.0")]
-  [Route("api/Business")]
+  [Route("api/1.0/Business")]
+  [ApiVersion("1.0")]  
   [ApiController]
   public class BusinessesController : ControllerBase
   {
@@ -29,11 +29,18 @@ namespace LocalBusiness.Controllers
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
+    public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter, string name/*, string goodsType*/)
     {
       var route = Request.Path.Value;
+      var query = _db.Businesses.AsQueryable();
       var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
-      var pagedData = await _db.Businesses
+      
+      if (name != null)
+      {
+        query = query.Where(entry => entry.Name == name);
+      }
+      
+      var pagedData = await query
         .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
         .Take(validFilter.PageSize)
         .ToListAsync();
