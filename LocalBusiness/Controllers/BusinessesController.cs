@@ -29,7 +29,7 @@ namespace LocalBusiness.Controllers
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter, string name/*, string goodsType*/)
+    public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter, string name, string goodsType)
     {
       var route = Request.Path.Value;
       var query = _db.Businesses.AsQueryable();
@@ -38,6 +38,11 @@ namespace LocalBusiness.Controllers
       if (name != null)
       {
         query = query.Where(entry => entry.Name == name);
+      }
+      
+      if (goodsType != null)
+      {
+        query = query.Where(entry => entry.GoodsType == goodsType);
       }
       
       var pagedData = await query
