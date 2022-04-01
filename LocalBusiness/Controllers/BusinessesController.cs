@@ -22,7 +22,7 @@ namespace LocalBusiness.Controllers
 
     public BusinessesController(LocalBusinessContext db)
     {
-      _db = dv
+      _db = db;
     }
 
     [HttpGet]
@@ -37,7 +37,7 @@ namespace LocalBusiness.Controllers
       _db.Businesses.Add(business);
       await _db.SaveChangesAsync();
 
-      return CreatedAtAction(nameOf(Get), new { id = business.BusinessId}, business);
+      return CreatedAtAction(nameof(GetBusiness), new { id = business.BusinessId}, business);
     }
 
     [HttpGet("{id}")]
