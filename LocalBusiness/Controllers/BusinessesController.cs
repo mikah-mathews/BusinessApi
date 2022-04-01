@@ -45,7 +45,7 @@ namespace LocalBusiness.Controllers
         query = query.Where(entry => entry.GoodsType == goodsType);
       }
       
-      var pagedData = await query
+      var pagedData = await query  
         .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
         .Take(validFilter.PageSize)
         .ToListAsync();
