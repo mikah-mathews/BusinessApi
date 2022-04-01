@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LocalBusiness.Models;
-// using LocalBusiness.Wrappers;
-// using LocalBusiness.Filter;
+using LocalBusiness.Wrappers;
+using LocalBusiness.Filter;
 // using LocalBusiness.Helpers;
 // using LocalBusiness.Services;
 
@@ -26,9 +26,15 @@ namespace LocalBusiness.Controllers
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Business>>> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
     {
-      return await _db.Businesses.ToListAsync();
+      var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+      var pagedData = await _db.Businesses
+        .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
+        .Take(validFilter.PageSize)
+        .ToListAsync();
+      var totalRecords = await _db.Businesses.CountAsync();
+      return Ok(new PagedResponse<List<Business>>(pagedData, validFilter.PageNumber,validFilter.PageSize));
     } 
 
     [HttpPost]
@@ -49,7 +55,7 @@ namespace LocalBusiness.Controllers
         return NotFound();
       }
 
-      return business;
+      return Ok(new Response<Business>(business));
     }
 
     [HttpPut("{id}")]
