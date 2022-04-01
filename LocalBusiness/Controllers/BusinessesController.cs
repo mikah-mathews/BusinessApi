@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using LocalBusiness.Models;
 using LocalBusiness.Wrappers;
 using LocalBusiness.Filter;
-// using LocalBusiness.Helpers;
-// using LocalBusiness.Services;
+using LocalBusiness.Helpers;
+using LocalBusiness.Services;
 
 namespace LocalBusiness.Controllers
 {
@@ -19,22 +19,26 @@ namespace LocalBusiness.Controllers
   public class BusinessesController : ControllerBase
   {
     private readonly LocalBusinessContext _db;
+    private readonly IUriService uriService;
 
-    public BusinessesController(LocalBusinessContext db)
+    public BusinessesController(LocalBusinessContext db, IUriService uriService)
     {
       _db = db;
+      this.uriService = uriService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] PaginationFilter filter)
     {
+      var route = Request.Path.Value;
       var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
       var pagedData = await _db.Businesses
         .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
         .Take(validFilter.PageSize)
         .ToListAsync();
       var totalRecords = await _db.Businesses.CountAsync();
-      return Ok(new PagedResponse<List<Business>>(pagedData, validFilter.PageNumber,validFilter.PageSize));
+      var pagedResponse = PaginationHelper.CreatePagedResponse<Business>(pagedData, validFilter, totalRecords, uriService, route);
+      return Ok(pagedResponse);
     } 
 
     [HttpPost]
