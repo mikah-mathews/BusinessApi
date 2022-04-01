@@ -14,7 +14,8 @@ using LocalBusiness.Services;
 
 namespace LocalBusiness.Controllers
 {
-  [Route("api/[controller]")]
+  [ApiVersion("1.0")]
+  [Route("api/Business")]
   [ApiController]
   public class BusinessesController : ControllerBase
   {
